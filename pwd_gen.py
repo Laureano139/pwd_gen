@@ -32,8 +32,15 @@ def main():
             break
     else:
         generated_password = gen_pwd()
+        print("Would you want to associate an email with this account? (yes/no): \n")
+        email_association = input().strip().lower()
+        if email_association == "yes" or email_association == "y":
+            email = input("Enter the email address: ").strip()
+        else:
+            email = None
         account = {
             "Platform": platform,
+            "Email": email,
             "Password": generated_password
         }
 
@@ -49,6 +56,26 @@ def main():
 
         with open("./accounts/accounts.json", "w") as f:
             json.dump(accounts, f, indent=4)
+            
+def main_menu():
+    print("Welcome to the Password Generator!\n")
+    print("1 - Generate a new password")
+    print("2 - Retrieve an existing password")
+    print("3 - Change email/password")
+    print("4 - Exit")
+
+    choice = input("Enter your choice (1/2/3/4): ").strip()
+    if choice == "1":
+        main()
+    # elif choice == "2":
+    #     retrieve_password()
+    # elif choice == "3":
+    #     change_email_password()
+    # elif choice == "4":
+    #     exit()
+    else:
+        print("Invalid choice. Please try again.")
+        main_menu()
 
 def gen_pwd():
     pwd_length = 12
