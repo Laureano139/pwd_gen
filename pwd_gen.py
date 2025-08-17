@@ -2,7 +2,7 @@ import os, random, string, json
 
 #TODO -> Encrypt json file and passwords
 
-def main():
+def main(filepath):
     print("Welcome to the Password Generator!\n")
     print("1 - Generate a new password")
     print("2 - Retrieve an existing password")
@@ -11,26 +11,26 @@ def main():
 
     choice = input("Enter your choice (1/2/3/4): ").strip()
     if choice == "1":
-        add_new_acc()
+        add_new_acc(filepath)
     elif choice == "2":
-        retrieve_password()
+        retrieve_password(filepath)
     elif choice == "3":
-        change_email_password()
+        change_email_password(filepath)
     elif choice == "4":
         exit()
     else:
         print("Invalid choice. Please try again.")
-        main()
+        main(filepath)
 
-def add_new_acc():
+def add_new_acc(filepath):
     platform = input("Enter the platform name: ").strip()
-    with open("./accounts/accounts.json", "r") as f:
-        if os.path.getsize("./accounts/accounts.json") == 0:
+    with open(filepath, "r") as f:
+        if os.path.getsize(filepath) == 0:
                 accs_json = []
         else:
             accs_json = json.load(f)
     for i in accs_json:
-        if os.path.getsize("./accounts/accounts.json") == 0:
+        if os.path.getsize(filepath) == 0:
             continue
         elif i["Platform"].lower() == platform.lower():
             print("Existing account found! Choose one option: \n")
@@ -45,7 +45,7 @@ def add_new_acc():
                 new_pwd = gen_pwd()
                 print("New password generated: ", new_pwd)
                 i["Password"] = new_pwd
-                with open("./accounts/accounts.json", "w") as f:
+                with open(filepath, "w") as f:
                     json.dump(accs_json, f, indent=4)
             elif choice == "3":
                 break
@@ -67,14 +67,14 @@ def add_new_acc():
         os.makedirs("./accounts", exist_ok=True)
 
         try:
-            with open("./accounts/accounts.json", "r") as f:
+            with open(filepath, "r") as f:
                 accounts = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             accounts = []
 
         accounts.append(account)
 
-        with open("./accounts/accounts.json", "w") as f:
+        with open(filepath, "w") as f:
             json.dump(accounts, f, indent=4)
 
 def gen_pwd():
@@ -102,8 +102,8 @@ def gen_pwd():
         
     return mixed_pwd
 
-def retrieve_password():
-    with open("./accounts/accounts.json", "r") as f:
+def retrieve_password(filepath):
+    with open(filepath, "r") as f:
         existing_accounts = json.load(f)
     print("Choose one of the existing accounts:\n")
     c = 1
@@ -121,8 +121,8 @@ def retrieve_password():
     else:
         print("Invalid choice.")
         
-def change_email_password():
-    with open("./accounts/accounts.json", "r") as f:
+def change_email_password(filepath):
+    with open(filepath, "r") as f:
         existing_accounts = json.load(f)
     print("Choose one of the existing accounts:\n")
     c = 1
@@ -166,7 +166,7 @@ def change_email_password():
 
             selected_account['Password'] = new_password
 
-        with open("./accounts/accounts.json", "w") as f:
+        with open(filepath, "w") as f:
             json.dump(existing_accounts, f, indent=4)
     else:
         print("Invalid choice.")
