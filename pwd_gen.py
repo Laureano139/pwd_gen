@@ -52,7 +52,7 @@ def add_new_acc(filepath):
             break
     else:
         generated_password = gen_pwd()
-        print("Would you want to associate an email with this account? (yes/no): \n")
+        print("Would you want to associate an email with this account? (yes/no): ")
         email_association = input().strip().lower()
         if email_association == "yes" or email_association == "y":
             email = input("Enter the email address: ").strip()

@@ -6,6 +6,15 @@ from pwd_gen import *
 USERS_FILE = "./users/users.json"
 ACCOUNTS_DIR = "./accounts"
 
+def ensure_storage():
+    os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
+    os.makedirs(ACCOUNTS_DIR, exist_ok=True)
+    if not os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'w') as f:
+            json.dump({}, f, indent=4)
+
+ensure_storage()
+
 def load_users():
     try:
         with open(USERS_FILE, 'r') as f:
