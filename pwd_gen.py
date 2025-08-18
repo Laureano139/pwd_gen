@@ -1,4 +1,5 @@
 import os, random, string, json
+from applogs import log_event
 
 #TODO -> Encrypt json file and passwords
 
@@ -38,15 +39,20 @@ def add_new_acc(filepath):
             print("2 - Generate a new password and update")
             print("3 - Cancel")
             choice = input("Enter your choice (1/2/3): ").strip()
+            
             if choice == "1":
                 print("Existing password: ", i["Password"])
+                log_event("show_existing_pwd", details={"platform": platform})
                 break
+            
             elif choice == "2":
                 new_pwd = gen_pwd()
                 print("New password generated: ", new_pwd)
                 i["Password"] = new_pwd
+                log_event("pwd_updated", details={"platform": platform})
                 with open(filepath, "w") as f:
                     json.dump(accs_json, f, indent=4)
+                    
             elif choice == "3":
                 break
             break
@@ -72,7 +78,8 @@ def add_new_acc(filepath):
         except (FileNotFoundError, json.JSONDecodeError):
             accounts = []
 
-        accounts.append(account)
+        accounts.append(account)        
+        log_event("account_created", details={"platform": platform, "email": email})
 
         with open(filepath, "w") as f:
             json.dump(accounts, f, indent=4)
@@ -118,8 +125,11 @@ def retrieve_password(filepath):
         print(f"Platform: {selected_account['Platform']}")
         print(f"Email: {selected_account['Email']}")
         print(f"Password: {selected_account['Password']}")
+        log_event("pwd_retrieved", details={"platform": selected_account['Platform']})
+
     else:
         print("Invalid choice.")
+        log_event("err_pwd_retrieved", details={"input_choice": input_choice})
         
 def change_email_password(filepath):
     with open(filepath, "r") as f:
@@ -147,6 +157,8 @@ def change_email_password(filepath):
             new_email = input("Enter the new email address: ").strip()
             if new_email:
                 selected_account['Email'] = new_email
+                log_event("email_changed", details={"platform": selected_account['Platform']})
+
         elif change_choice == "2":
             print("Choose the action you want to do:")
             print("1 - Generate a new password")
@@ -158,13 +170,15 @@ def change_email_password(filepath):
             elif password_choice == "2":
                 new_password = input("Enter the new password: ").strip()
                 if new_password == "":
-                    print("Password cannot be empty! Please enter a valid password.")
+                    print("Password can not be empty! Please enter a valid password.")
+                    log_event("err_password_changed", details={"err_type": "Password can not be empty!"})
                     return
             else:
                 print("Invalid choice.")
                 return
 
             selected_account['Password'] = new_password
+            log_event("password_changed", details={"platform": selected_account['Platform']})
 
         with open(filepath, "w") as f:
             json.dump(existing_accounts, f, indent=4)

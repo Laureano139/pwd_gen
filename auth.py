@@ -2,6 +2,7 @@ import bcrypt
 import json
 import os
 from pwd_gen import *
+from applogs import log_event
 
 USERS_FILE = "./users/users.json"
 ACCOUNTS_DIR = "./accounts"
@@ -63,6 +64,7 @@ def register_user():
                 json.dump([], f, indent=4)
 
             print(f"User '{username}' registered successfully!")
+            log_event("user_registered", user=username)
             return True
         else:
             print("Passwords do not match. Please try again.")
@@ -84,11 +86,15 @@ def login_user():
         hashed_password = user_data["password_hash"].encode('utf-8')
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
             print(f"Login successful! Welcome, {username}!")
+            log_event("login_success", user=username)
             return True, user_data
         else:
             print("Incorrect password.")
+            log_event("login_failure", user=username)
+
     else:
-        print("User not found.")
+        print("Error: User not found!")
+        log_event("login_unknown_user", user=username)
     
     return False, None
 
@@ -110,6 +116,7 @@ def main_menu():
             register_user()
         elif choice == '3':
             print("Exiting...")
+            log_event("app_exit")
             return False, None
         else:
             print("Invalid option. Please try again.")
